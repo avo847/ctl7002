@@ -1,11 +1,11 @@
 import collections as coll
 import numpy as np
-import sys
+
+import xlwt
 
 class SumCounter:
   def __init__(self):
     self.data = {}
-    self.addends =[6,9,20]
     
   def add_sum(self, x, tuple):
     try:
@@ -43,17 +43,37 @@ class SumCounter:
       print sum, ": "
       for x in self.data[sum]:
         print x
-
         
-# test code
+  def write_xls(self, filename):
+    self.sort_data()
+    book = xlwt.Workbook()
+    sh = book.add_sheet("Sheet 1")
+    
+    sh.write(0,0, "sum")
+    sh.write(0,1,"boxes of 6, 9, and 20")
+    sh.write(0,2,"total nuggets")
+    
+    row_num=1
+    for sum in self.data:
+      if sum > 0:
+        sh.write(row_num, 0, sum)
+        for x in self.data[sum]:
+          y = np.array(x)
+          y[0] = 6*y[0]
+          y[1] = 9*y[1]
+          y[2] = 20*y[2]
+          
+          sh.write(row_num, 1, str(x))
+          sh.write(row_num, 2, " + ".join(map(str,y))+ " = " + str(sum))
+          row_num += 1
+        
+    book.save(filename)
+    
+        
+# run code
 my_sums = SumCounter()
 my_sums.build()
-print "ok"
-
-
-sys.stdout = open('output.txt', 'w')
-my_sums.print_sums()
-
+my_sums.write_xls('output.xls')
 
     
 
